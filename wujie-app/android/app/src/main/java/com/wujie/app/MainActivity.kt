@@ -3,6 +3,7 @@ package com.wujie.app
 import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.KeyEvent
+import android.webkit.JavascriptInterface
 import android.webkit.WebChromeClient
 import android.webkit.WebSettings
 import android.webkit.WebView
@@ -16,12 +17,21 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var web: WebView
 
-    private fun applyImmersive() {
-        WindowCompat.setDecorFitsSystemWindows(window, false)
-        WindowInsetsControllerCompat(window, window.decorView).apply {
-            hide(WindowInsetsCompat.Type.systemBars())
-            systemBarsBehavior =
-                WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+    inner class UiBridge {
+        @JavascriptInterface
+        fun setFullscreen(on: Boolean) {
+            runOnUiThread {
+                val controller = WindowInsetsControllerCompat(window, window.decorView)
+                if (on) {
+                    WindowCompat.setDecorFitsSystemWindows(window, false)
+                    controller.hide(WindowInsetsCompat.Type.systemBars())
+                    controller.systemBarsBehavior =
+                        WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+                } else {
+                    WindowCompat.setDecorFitsSystemWindows(window, true)
+                    controller.show(WindowInsetsCompat.Type.systemBars())
+                }
+            }
         }
     }
 
@@ -30,7 +40,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         web = WebView(this)
         setContentView(web)
-        applyImmersive()
+        web.addJavascriptInterface(UiBridge(), "WujieUI")
 
         web.settings.apply {
             javaScriptEnabled = true
@@ -53,11 +63,6 @@ class MainActivity : AppCompatActivity() {
             return true
         }
         return super.onKeyDown(keyCode, event)
-    }
-
-    override fun onWindowFocusChanged(hasFocus: Boolean) {
-        super.onWindowFocusChanged(hasFocus)
-        if (hasFocus) applyImmersive()
     }
 
     override fun onPause() {
