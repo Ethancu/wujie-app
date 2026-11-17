@@ -3,14 +3,11 @@ package com.wujie.app
 import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.content.Context
-import android.graphics.Color
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.text.InputType
-import android.view.Gravity
 import android.view.KeyEvent
-import android.view.View
 import android.webkit.JavascriptInterface
 import android.webkit.WebChromeClient
 import android.webkit.WebResourceError
@@ -21,7 +18,6 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.EditText
 import android.widget.FrameLayout
-import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
@@ -31,19 +27,15 @@ import androidx.core.view.WindowInsetsControllerCompat
 class MainActivity : AppCompatActivity() {
 
     private lateinit var web: WebView
-    private lateinit var gear: TextView
     private val prefs by lazy { getSharedPreferences("wujie", Context.MODE_PRIVATE) }
     private val handler = Handler(Looper.getMainLooper())
     private var pageLoaded = false
     private var dialogShowing = false
 
-    private fun dp(v: Int): Int = (v * resources.displayMetrics.density).toInt()
-
     inner class UiBridge {
         @JavascriptInterface
         fun setFullscreen(on: Boolean) {
             runOnUiThread {
-                gear.visibility = if (on) View.GONE else View.VISIBLE
                 val controller = WindowInsetsControllerCompat(window, window.decorView)
                 if (on) {
                     WindowCompat.setDecorFitsSystemWindows(window, false)
@@ -120,18 +112,6 @@ class MainActivity : AppCompatActivity() {
         web = WebView(this)
         root.addView(web, FrameLayout.LayoutParams(
             FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT))
-
-        gear = TextView(this).apply {
-            text = "⚙"
-            setTextColor(Color.parseColor("#CCFFFFFF"))
-            textSize = 20f
-            gravity = Gravity.CENTER
-            setBackgroundColor(Color.parseColor("#66000000"))
-            setOnClickListener { askUrl("修改服务器地址") }
-        }
-        val lp = FrameLayout.LayoutParams(dp(40), dp(40), Gravity.BOTTOM or Gravity.END)
-        lp.setMargins(0, 0, dp(12), dp(72))
-        root.addView(gear, lp)
         setContentView(root)
 
         web.addJavascriptInterface(UiBridge(), "WujieUI")
