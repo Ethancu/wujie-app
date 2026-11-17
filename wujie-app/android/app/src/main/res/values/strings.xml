@@ -1,6 +1,6 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- 站点地址：外网建议 https，局域网可先用 NAS 地址 -->
     <string name="app_name">无界</string>
-    <string name="site_url">https://wagon-arkansas-label-avatar.trycloudflare.com</string>
+    <string name="site_url">https://spoke-february-processes-jefferson.trycloudflare.com</string>
 </resources>
